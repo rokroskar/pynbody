@@ -30,7 +30,6 @@ import traceback
 
 from units import has_units
 
-
 class SimSnap(object):
     """The class for managing simulation snapshots.
 
@@ -1937,3 +1936,31 @@ def _new(n_particles=0, **families):
 
     x._decorate()
     return x
+
+
+#
+# SIMSNAP THAT PLAYS NICE WITH SPARK
+#
+
+class SimSnapRDD(SimSnap) : 
+    """
+    extends the functionality of a SimSnap to use Spark
+    """
+
+    def __init__(self, sc) : 
+        self._sc = sc
+        self._rdd_array_registry = {}
+
+    def __getitem__(self, i) :
+        try : 
+            if i in self._rdd_array_registry : 
+                return self._rdd_array_registry[i].values().takeSample(False,1e5,1)[0]
+            else :
+                self._rdd_array_registry[i] = self._rdd_arrays.filter(lambda x: x[0] == i).reduceByKey(_reduce_arrays).cache()
+                return self.__getitem__(i)
+        except AttributeError :  # THIS IS BAD -- CHANGE ASAP
+            raise KeyError
+
+def _reduce_arrays(*args):
+    return np.concatenate(args)
+

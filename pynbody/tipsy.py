@@ -35,6 +35,7 @@ import warnings
 import copy
 import types
 import math
+import collections
 
 class TipsySnap(snapshot.SimSnap) :
     _basic_loadable_keys = {family.dm: set(['phi', 'pos', 'eps', 'mass', 'vel']),
@@ -1499,3 +1500,131 @@ def slparam2units(sim) :
             
         sim.star["rhoform"].units = denunit_st
         sim.star["massform"].units = munit_st
+
+
+###
+# TIPSY CLASS THAT PLAYS NICE WITH SPARK
+###
+
+class TipsySnapRDD(snapshot.SimSnapRDD, TipsySnap) : 
+    _basic_loadable_keys = {family.dm: set(['phi', 'pos', 'eps', 'mass', 'vel']),
+                            family.gas: set(['phi', 'temp', 'pos', 'metals', 'eps',
+                                             'mass', 'rho', 'vel']),
+                            family.star: set(['phi', 'tform', 'pos', 'metals',
+                                              'eps','mass', 'vel']),
+                            None: set(['phi', 'pos', 'eps', 'mass', 'vel']) }
+    
+    def __init__(self,filename,sc, **kwargs):
+        global config
+
+        TipsySnap.__init__(self, filename) 
+        snapshot.SimSnapRDD.__init__(self,sc)
+        
+        # use local variables to avoid sending entire snapshot to the map functions
+        npartitions = self.npartitions
+        family_slice = self._family_slice
+
+        # make the initial RDD by distributing the LoadControl objects
+        self._rdd_lc = sc.parallelize(range(npartitions)).map(
+                lambda x: _make_index_list(x,npartitions,family_slice))
+
+
+    def _load_main_file(self) :
+        filename = self._filename
+        dtypes = collections.OrderedDict([(family.gas, self._g_dtype), 
+                                         (family.dm, self._d_dtype),
+                                         (family.star, self._s_dtype)])
+        byteswap = self._byteswap
+
+        self._rdd_arrays = self._rdd_lc.flatMap(    
+            lambda x: _load_snapshot_to_rdd(x,filename)).cache()
+
+    @property
+    def npartitions(self) : 
+        return self._sc.defaultParallelism
+
+def _make_index_list(i,npartitions,disk_family_slice):
+    # make the 'take' index array
+    ind_arr = np.array([],dtype=int)
+
+    for fam,sl in disk_family_slice.iteritems() : 
+        ntot = sl.stop-sl.start
+        n_per_part = ntot//npartitions
+        start = i*n_per_part + sl.start
+        stop = sl.stop if i == npartitions-1 else start + n_per_part
+
+        ind_arr = np.concatenate((ind_arr,np.arange(start,stop,dtype=int)))
+
+    return ind_arr
+
+def _load_snapshot_to_rdd(ind, filename) :
+    s = TipsySnap(filename,take=ind)
+    print len(s)
+    s._load_main_file()
+
+    arrays = []
+
+    # first the global arrays
+    for arr in s.keys() :
+        arrays.append((arr,s[arr]))
+
+    # now the gas and star families
+    for arr in s._basic_loadable_keys[family.gas].difference(s._basic_loadable_keys[None]) :
+        arrays.append((arr+'_g',s.g[arr]))
+    for arr in s._basic_loadable_keys[family.star].difference(s._basic_loadable_keys[None]) :
+        arrays.append((arr+'_s',s.s[arr]))
+
+    return arrays
+
+
+def _load_main_file_to_rdd(lc, filename, dtypes, byteswap) :
+    f = util.open_(filename,'rb')
+    f.seek(32)
+
+    arrays = collections.OrderedDict()
+
+    g_dtype, d_dtype, s_dtype = dtypes.values()
+
+    for fam in dtypes.keys() : 
+        arrays[fam] = {}
+
+    # set up arrays for each family
+    for fam, sl in lc.mem_family_slice.iteritems(): 
+        nparts = sl.stop-sl.start
+
+        for arr in dtypes[fam].names :
+            arrays[fam][arr] = np.zeros(nparts,dtype=dtypes[fam][arr])
+
+    max_item_size = max([q.itemsize for q in dtypes.values()])
+    tbuf = bytearray(max_item_size*10240)
+
+    for fam, dtype in ((family.gas, dtypes[family.gas]), 
+                       (family.dm, dtypes[family.dm]), 
+                       (family.star, dtypes[family.star])):
+
+        st_len = dtype.itemsize
+
+        for readlen, buf_index, mem_index in lc.iterate([fam],[fam], multiskip=True) :
+    
+            if mem_index is None: 
+                f.seek(st_len*readlen,1)
+                continue
+
+            buf = np.fromstring(f.read(st_len*readlen),dtype=dtype)
+            
+            if byteswap : 
+                buf = buf.byteswap()
+
+            if mem_index is not None :
+                for name in dtype.names : 
+                    arrays[fam][name][mem_index] = buf[name][buf_index].copy()
+
+    f.close()
+
+
+
+    return  [[(arr,arrays[fam][arr]) for arr in arrays[fam].keys()] for fam in arrays.keys()]
+
+
+    
+
