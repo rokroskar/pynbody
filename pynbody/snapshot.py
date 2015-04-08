@@ -1954,7 +1954,7 @@ class SimSnapRDD(SimSnap) :
     def __getitem__(self, i) :
         try : 
             if i in self._rdd_array_registry : 
-                return self._rdd_array_registry[i].values().takeSample(False,1e5,1)[0]
+                return self._rdd_array_registry[i].values()[0]
             else :
                 self._rdd_array_registry[i] = self._rdd_arrays.filter(lambda x: x[0] == i).reduceByKey(_reduce_arrays).cache()
                 return self.__getitem__(i)
