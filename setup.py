@@ -1,8 +1,6 @@
 import os
 from setuptools import setup, Extension
 
-import numpy
-import numpy.distutils.misc_util
 import glob
 import tempfile
 import subprocess
@@ -190,12 +188,16 @@ if have_pthread:
 
 extra_link_args = []
 
-incdir = numpy.distutils.misc_util.get_numpy_include_dirs()
+def get_incdir():
+  """Return numpy include directory."""
+  import numpy
+  import numpy.distutils.misc_util
+  return numpy.distutils.misc_util.get_numpy_include_dirs()
 
 kdmain = Extension('pynbody/sph/kdmain',
                    sources = ['pynbody/sph/kdmain.cpp', 'pynbody/sph/kd.cpp',
                               'pynbody/sph/smooth.cpp'],
-                   include_dirs=incdir,
+                   include_dirs=get_incdir(),
                    undef_macros=['DEBUG'],
 
                    libraries=libraries,
@@ -204,43 +206,43 @@ kdmain = Extension('pynbody/sph/kdmain',
 
 gravity = Extension('pynbody.gravity._gravity',
                         sources = ["pynbody/gravity/_gravity.pyx"],
-                        include_dirs=incdir,
+                        include_dirs=get_incdir(),
                         extra_compile_args=openmp_args,
                         extra_link_args=openmp_args)
 
 omp_commands = Extension('pynbody.openmp',
                         sources = ["pynbody/"+openmp_module_source+".pyx"],
-                        include_dirs=incdir,
+                        include_dirs=get_incdir(),
                         extra_compile_args=openmp_args,
                         extra_link_args=openmp_args)
 
 chunkscan = Extension('pynbody.chunk.scan',
                   sources=['pynbody/chunk/scan.pyx'],
-                  include_dirs=incdir)
+                  include_dirs=get_incdir())
 
 sph_render = Extension('pynbody.sph._render',
                   sources=['pynbody/sph/_render.pyx'],
-                  include_dirs=incdir)
+                  include_dirs=get_incdir())
 
 halo_pyx = Extension('pynbody.analysis._com',
                      sources=['pynbody/analysis/_com.pyx'],
-                     include_dirs=incdir,
+                     include_dirs=get_incdir(),
                      extra_compile_args=openmp_args,
                      extra_link_args=openmp_args)
 
 bridge_pyx = Extension('pynbody.bridge._bridge',
                      sources=['pynbody/bridge/_bridge.pyx'],
-                     include_dirs=incdir)
+                     include_dirs=get_incdir())
 
 util_pyx = Extension('pynbody._util',
                      sources=['pynbody/_util.pyx'],
-                     include_dirs=incdir,
+                     include_dirs=get_incdir(),
                      extra_compile_args=openmp_args,
                      extra_link_args=openmp_args)
 
 interpolate3d_pyx = Extension('pynbody.analysis._interpolate3d',
                               sources = ['pynbody/analysis/_interpolate3d.pyx'],
-                              include_dirs=incdir,
+                              include_dirs=get_incdir(),
                               extra_compile_args=openmp_args,
                               extra_link_args=openmp_args)
 
@@ -280,7 +282,7 @@ and the detected cython version is {1}.
                 sys.exit(1)
 
 dist = setup(name = 'pynbody',
-             install_requires='numpy>=1.5',
+             install_requires=['numpy>=1.5', 'scipy', 'six'],
              author = 'The pynbody team',
              author_email = 'pynbody@googlegroups.com',
              version = '0.45',
