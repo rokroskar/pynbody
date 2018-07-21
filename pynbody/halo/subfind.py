@@ -60,7 +60,7 @@ class SubfindCatalogue(HaloCatalogue):
         ar = np.zeros(len(self.base), dtype=int)-1
         for i in range(0, self.header[1]): #total number of groups
             if v:
-                print "Halo #", i , "of", self.header[1]
+                print("Halo # %d of %d"%(i, self.header[1]))
             halo=self[i]
             ar[halo.get_index_list(self.base)] = halo._halo_id
         return ar

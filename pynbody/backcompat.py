@@ -1,6 +1,4 @@
 import sys
-import __builtin__
-
 
 if sys.version_info[:2] <= (2, 5):
 
@@ -39,10 +37,14 @@ if sys.version_info[:2] <= (2, 5):
             return cls_ns[propname]
 
 
-else:
+elif sys.version_info[0] == 2:
+    import __builtin__
     property = __builtin__.property
     import fractions
-
+else:
+    import builtins
+    property = builtins.property
+    import fractions
 
 if sys.version_info[:2] <= (2, 6):
     from .bc_modules import ordered_dict

@@ -3,7 +3,7 @@
 cosmology
 =========
 
-A set of functions for common cosmological calculations. 
+A set of functions for common cosmological calculations.
 
 """
 
@@ -46,7 +46,7 @@ def _lingrowthfac(red, omegam0, omegal0, return_norm=False):
     import scipy.integrate
 
     if (abs(omegam0 + omegal0 - 1.) > 1.e-4):
-        raise RuntimeError, "Linear growth factors can only be calculated for flat cosmologies"
+        raise RuntimeError("Linear growth factors can only be calculated for flat cosmologies")
 
     a = 1 / (1. + red)
 
@@ -173,7 +173,7 @@ def age(f, z=None, unit='Gyr'):
 
 @units.takes_arg_in_units((1, "Gyr"), context_arg=0)
 def redshift(f, time):
-    """ 
+    """
     Calculate the redshift given a snapshot and a time since Big Bang
     in Gyr.
 

@@ -89,7 +89,7 @@ class GrafICSnap(SimSnap):
         self._create_array('pos', 3)
         self['pos'].units = "Mpc a"
         pos = self['pos']
-        nx, ny, nz = [int(self._header[x]) for x in 'nx', 'ny', 'nz']
+        nx, ny, nz = [int(self._header[x]) for x in ['nx', 'ny', 'nz']]
 
         # the following is equivalent to
         #

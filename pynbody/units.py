@@ -138,9 +138,13 @@ class UnitBase(object):
             p = Fraction(p[0], p[1])
         if not (isinstance(p, Fraction) or isinstance(p, int)):
             if isinstance(p, float):
-                raise ValueError, "Units can only be raised to integer or fractional powers. Use python's built-in fractions module or a tuple: e.g. unit**(1,2) represents a square root."
+                raise ValueError(
+                    "Units can only be raised to integer or fractional powers."
+                    "Use python's built-in fractions module or a tuple: "
+                    "e.g. unit**(1,2) represents a square root.")
             else :
-                raise ValueError, "Units can only be raised to integer or fractional powers"
+                raise ValueError(
+                    "Units can only be raised to integer or fractional powers")
         return CompositeUnit(1, [self], [p]).simplify()
 
     def __truediv__(self, m):
@@ -266,7 +270,7 @@ class UnitBase(object):
             raise UnitsException("Unit with this name already exists")
         if "**" in st or "^" in st or " " in st:
             # will cause problems for simple string parser in Unit() factory
-            raise UnitsException, "Unit names cannot contain '**' or '^' or spaces"
+            raise UnitsException("Unit names cannot contain '**' or '^' or spaces")
         _registry[st] = self
 
     def __deepcopy__(self, memo):

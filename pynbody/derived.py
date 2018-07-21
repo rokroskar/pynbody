@@ -8,7 +8,7 @@ getting the radial position. For more information see :ref:`derived`.
 """
 
 from . import snapshot
-from snapshot import SimSnap
+from .snapshot import SimSnap
 from . import array
 from . import analysis
 from . import sph

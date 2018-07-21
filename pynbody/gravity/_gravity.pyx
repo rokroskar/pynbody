@@ -1,8 +1,8 @@
 #cython: embedsignature=True
 
 cimport cython
-from pynbody import units, array, config, openmp
-from pynbody.util import get_eps
+from .. import units, array, config, openmp
+from ..util import get_eps
 import numpy as np
 cimport numpy as np
 DTYPE = np.double

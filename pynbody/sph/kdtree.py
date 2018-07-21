@@ -63,7 +63,7 @@ class KDTree(object):
         elif name=="qty_sm":
             return 4
         else :
-            raise ValueError, "Unknown KDTree array"
+            raise ValueError("Unknown KDTree array")
 
     def set_array_ref(self, name, ar) :
         kdmain.set_arrayref(self.kdtree,self.array_name_to_id(name),ar)
@@ -84,7 +84,7 @@ class KDTree(object):
                 return self.PROPID_QTYMEAN_1D
             elif len(input_array.shape)==2:
                 if input_array.shape[1]!=3:
-                    raise ValueError, "Currently only able to smooth 3D or 1D arrays"
+                    raise ValueError("Currently only able to smooth 3D or 1D arrays")
                 return self.PROPID_QTYMEAN_ND
         elif name=="qty_disp":
             input_array = self.get_array_ref('qty')
@@ -92,10 +92,10 @@ class KDTree(object):
                 return self.PROPID_QTYDISP_1D
             elif len(input_array.shape)==2:
                 if input_array.shape[1]!=3:
-                    raise ValueError, "Currently only able to smooth 3D or 1D arrays"
+                    raise ValueError("Currently only able to smooth 3D or 1D arrays")
                 return self.PROPID_QTYDISP_ND
         else:
-            raise ValueError, "Unknown smoothing request %s"%name
+            raise ValueError("Unknown smoothing request %s"%name)
 
 
 

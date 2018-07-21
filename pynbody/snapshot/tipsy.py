@@ -124,7 +124,7 @@ class TipsySnap(SimSnap):
 
         if not self._paramfile.has_key('dKpcUnit'):
             if must_have_paramfile:
-                raise RuntimeError, "Could not find .param file for this run. Place it in the run's directory or parent directory."
+                raise RuntimeError("Could not find .param file for this run. Place it in the run's directory or parent directory.")
             else:
                 warnings.warn(
                     "No readable param file in the run directory or parent directory: using defaults.", RuntimeWarning)
@@ -196,7 +196,7 @@ class TipsySnap(SimSnap):
             write += ['vx', 'vy', 'vz']
 
         max_item_size = max(
-            [q.itemsize for q in self._g_dtype, self._d_dtype, self._s_dtype])
+            [q.itemsize for q in [self._g_dtype, self._d_dtype, self._s_dtype]])
         tbuf = bytearray(max_item_size * 10240)
 
         for fam, dtype in ((family.gas, self._g_dtype), (family.dm, self._d_dtype), (family.star, self._s_dtype)):
@@ -238,8 +238,8 @@ class TipsySnap(SimSnap):
                 else:
                     buflen = struct.unpack("i", header)[0]
 
-                ourlen_1 = (self._load_control.disk_num_particles)& 0xffffffffL
-                ourlen_3 = (self._load_control.disk_num_particles*3)& 0xffffffffL
+                ourlen_1 = (self._load_control.disk_num_particles)& 0xffffffff
+                ourlen_3 = (self._load_control.disk_num_particles*3)& 0xffffffff
 
                 if buflen == ourlen_1:  # it's a vector
                     return True
@@ -290,7 +290,7 @@ class TipsySnap(SimSnap):
         """
 
         if self.partial_load:
-            raise RuntimeError, "Writing back to partially loaded files not yet supported"
+            raise RuntimeError("Writing back to partially loaded files not yet supported")
 
         global config
 
@@ -627,7 +627,7 @@ class TipsySnap(SimSnap):
         assert fam is not None
 
         if self.partial_load:
-            raise RuntimeError, "Writing back to partially loaded files not yet supported"
+            raise RuntimeError("Writing back to partially loaded files not yet supported")
 
         fam_in_main = self._families_in_main_file(array_name, fam)
         if len(fam_in_main) > 0:
@@ -686,7 +686,7 @@ class TipsySnap(SimSnap):
                 if len(fam) == 0:
                     return
             else:
-                raise RuntimeError, "Cannot call static _write_array to write into main tipsy file."
+                raise RuntimeError("Cannot call static _write_array to write into main tipsy file.")
 
         units_out = None
         dtype = None
@@ -763,7 +763,7 @@ class TipsySnap(SimSnap):
             # Bottom line says 'you requested one family, but that one's not
             # available'
 
-            raise IOError, "This array is marked as available only for families %s" % fams
+            raise IOError("This array is marked as available only for families %s" % fams)
 
         data = self.__read_array_from_disk(array_name, fam=fam,
                                            filename=filename,
@@ -823,7 +823,7 @@ class TipsySnap(SimSnap):
             l = int(f.readline())
             binary = False
             if l != self._load_control.disk_num_particles:
-                raise IOError, "Incorrect file format"
+                raise IOError("Incorrect file format")
 
             if not dtype:
                 # Inspect the first line to see whether it's float or int
@@ -854,7 +854,7 @@ class TipsySnap(SimSnap):
                 l = struct.unpack("i", f.read(4))[0]
 
             if l != self._load_control.disk_num_particles:
-                raise IOError, "Incorrect file format"
+                raise IOError("Incorrect file format")
 
             if dtype is None:
                 # Set data format to be read (float or int) based on config
@@ -917,7 +917,7 @@ class TipsySnap(SimSnap):
         else:
             l = glob.glob(os.path.join(x, "../*.starlog"))
             if (len(l) == 0):
-                raise IOError, "Couldn't find starlog file"
+                raise IOError("Couldn't find starlog file")
             for filename in l:
                 sl = StarLog(filename)
 
@@ -937,7 +937,7 @@ class TipsySnap(SimSnap):
         #b(sl)['velform'] = sl['vel'][:len(self.star), :]
         if 'h2form' in sl.star.keys():
             b(b(b(sl))).star['h2form'] = b(b(sl)).star['h2form']
-        else: print "No H2 data found in StarLog file"
+        else: print("No H2 data found in StarLog file")
         for i, x in enumerate(['x', 'y', 'z']):
             self._arrays[x + 'form'] = self['posform'][:, i]
         for i, x in enumerate(['vx', 'vy', 'vz']):
@@ -1194,7 +1194,7 @@ class StarLog(SimSnap):
                 # All star iorders are greater than any gas iorder
                 # so this indicates a bad format. (N.B. there is the
                 # possibility of a false negative)
-                if(testread['iord'][0] < testread['iorderGas'][0]): 
+                if(testread['iord'][0] < testread['iorderGas'][0]):
                     file_structure = np.dtype({'names': ("iord", "iorderGas",
                                              "tform",
                                              "x", "y", "z",
@@ -1222,12 +1222,12 @@ class StarLog(SimSnap):
             molecH = False
 
             if (iSize != file_structure.itemsize and iSize != 104):
-                raise IOError, "Unknown starlog structure iSize:" + \
+                raise IOError("Unknown starlog structure iSize:" + \
                     str(iSize) + ", file_structure itemsize:" + \
-                    str(file_structure.itemsize)
+                    str(file_structure.itemsize))
             else:
                 bigstarlog = True
-        if molecH == True: print "h2 information found in StarLog!"
+        if molecH == True: print("h2 information found in StarLog!")
         datasize = os.path.getsize(filename) - f.tell()
 
         # check whether datasize is a multiple of iSize. If it is not,
@@ -1401,7 +1401,7 @@ def load_paramfile(sim):
                 s = line.split("#")[0].split()
                 sim._paramfile[s[0]] = " ".join(s[2:])
 
-        except IndexError, ValueError:
+        except (IndexError, ValueError):
             pass
 
         if len(sim._paramfile) > 1:

@@ -12,7 +12,7 @@ import numpy as np
 import os
 from ..array import SimArray
 
-from interpolate import interpolate2d
+from .interpolate import interpolate2d
 
 
 def calc_mags(simstars, band='v'):
@@ -23,7 +23,7 @@ def calc_mags(simstars, band='v'):
     Marigo+ (2008), Girardi+ (2010)
 
     pynbody includes a grid of SSP luminosities for many bandpasses for
-    various stellar ages and metallicities.  This function linearly 
+    various stellar ages and metallicities.  This function linearly
     interpolates to the desired value and returns the value as a magnitude.
 
     **Usage:**
@@ -33,7 +33,7 @@ def calc_mags(simstars, band='v'):
 
     **Optional keyword arguments:**
 
-       *band* (default='v'): Which observed bandpass magnitude in which 
+       *band* (default='v'): Which observed bandpass magnitude in which
             magnitude should be calculated
 
     """
@@ -46,7 +46,7 @@ def calc_mags(simstars, band='v'):
     if os.path.exists(lumfile):
         lums = np.load(lumfile)
     else:
-        raise IOError, "cmdlum.npz (magnitude table) not found"
+        raise IOError("cmdlum.npz (magnitude table) not found")
 
     age_star = simstars['age'].in_units('yr')
     # allocate temporary metals that we can play with
@@ -67,7 +67,7 @@ def calc_mags(simstars, band='v'):
     try:
         vals = output_mags - 2.5 * \
             np.log10(simstars['massform'].in_units('Msol'))
-    except KeyError, ValueError:
+    except (KeyError, ValueError):
         vals = output_mags - 2.5 * np.log10(simstars['mass'].in_units('Msol'))
 
     vals.units = None
@@ -89,7 +89,7 @@ def halo_mag(sim, band='v'):
 
     **Optional keyword arguments:**
 
-       *band* (default='v'): Which observed bandpass magnitude in which 
+       *band* (default='v'): Which observed bandpass magnitude in which
             magnitude should be calculated
     """
     if (len(sim.star) > 0):
@@ -113,7 +113,7 @@ def halo_lum(sim, band='v'):
 
     **Optional keyword arguments:**
 
-       *band* (default='v'): Which observed bandpass magnitude in which 
+       *band* (default='v'): Which observed bandpass magnitude in which
             magnitude should be calculated
     """
     sun_abs_mag = {'u':5.56,'b':5.45,'v':4.8,'r':4.46,'i':4.1,'j':3.66,

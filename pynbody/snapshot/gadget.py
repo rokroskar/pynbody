@@ -9,25 +9,23 @@ automatically via pynbody.load.
 
 """
 
-
-from .. import array, units
-from .. import family
-from .. import config
-from .. import config_parser
-from .. import util
-from .. import backcompat
-from . import SimSnap
-from . import namemapper
-
-import ConfigParser
-import numpy as np
-import struct
-import sys
 import copy
-import os.path as path
-import warnings
 import errno
 import itertools
+import os.path as path
+import struct
+import sys
+import warnings
+
+import numpy as np
+
+from . import SimSnap, namemapper
+from .. import array, backcompat, config, config_parser, family, units, util
+
+if sys.version_info[0] == 2:
+    import ConfigParser
+else:
+    import configparser as ConfigParser
 
 # This is set here and not in a config file because too many things break
 # if it is not 6
@@ -295,8 +293,8 @@ class GadgetFile(object):
                 if record_size != 256:
                     raise IOError("Bad record size for HEAD in " + filename)
                 t_part = self.header.npart.sum()
-                if  ((not self.format2) and 
-                	((self.header.npart != 0) * (self.header.mass == 0)).sum()==0):
+                if  ((not self.format2) and
+                    ((self.header.npart != 0) * (self.header.mass == 0)).sum()==0):
                     # The "Spec" says that if all the existing particle masses
                     # are in the header, we shouldn't have a MASS block
                     self.block_names.remove(b"MASS")
@@ -630,14 +628,14 @@ class GadgetFile(object):
         # a mode will ignore the file position, and w truncates the file.
         try:
             fd = open(filename, "r+b")
-        except IOError as (err, strerror):
+        except IOError as err:
             # If we couldn't open it because it doesn't exist open it for
             # writing.
             if err == errno.ENOENT:
                 fd = open(filename, "w+b")
             # If we couldn't open it for any other reason, reraise exception
             else:
-                raise IOError(err, strerror)
+                raise err
         fd.seek(0)  # Header always at start of file
         # Write header
         fd.write(data)
@@ -1177,7 +1175,7 @@ def do_units(sim):
     mass_unit = config_parser.get('gadget-units', 'mass')
 
     vel_unit, dist_unit, mass_unit = [
-        units.Unit(x) for x in vel_unit, dist_unit, mass_unit]
+        units.Unit(x) for x in [vel_unit, dist_unit, mass_unit]]
 
     if not _header_suggests_cosmological(sim.header):
         # remove a and h dependences

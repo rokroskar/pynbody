@@ -102,7 +102,7 @@ class SubFindHDFHaloCatalogue(HaloCatalogue) :
         super(SubFindHDFHaloCatalogue,self).__init__(sim)
 
         if not isinstance(sim, snapshot.gadgethdf.SubFindHDFSnap):
-            raise ValueError, "SubFindHDFHaloCatalogue can only work with a SubFindHDFSnap simulation"
+            raise ValueError("SubFindHDFHaloCatalogue can only work with a SubFindHDFSnap simulation")
 
         self.__init_halo_offset_data()
         self.__init_subhalo_relationships()

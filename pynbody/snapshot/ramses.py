@@ -17,25 +17,22 @@ the `ipython notebook demo
 from __future__ import with_statement  # for py2.5
 from __future__ import division
 
-from .. import array, util
-from .. import family
-from .. import units
-from .. import config, config_parser
-from .. import analysis
-from . import SimSnap
-from ..util import read_fortran, read_fortran_series, skip_fortran
-from . import namemapper
-
+import csv
+import logging
 import os
-import numpy as np
-import warnings
 import re
 import time
-import logging
-import csv
+import warnings
+from collections import OrderedDict
+
+import numpy as np
+
+from . import SimSnap, namemapper
+from .. import analysis, array, config, config_parser, family, units, util
+from ..util import read_fortran, read_fortran_series, skip_fortran
+
 logger = logging.getLogger('pynbody.snapshot.ramses')
 
-from collections import OrderedDict
 
 multiprocess_num = int(config_parser.get('ramses', "parallel-read"))
 multiprocess = (multiprocess_num > 1)
@@ -269,10 +266,10 @@ def _cpui_load_gas_vars(dims, maxlevel, ndim, filename, cpu, lia, i1,
         nvar_file = header['nrtvar']
         exact_nvar = True
     else:
-        raise ValueError, "Unknown RAMSES load mode"
+        raise ValueError("Unknown RAMSES load mode")
 
     if nvar_file != nvar and exact_nvar:
-        raise ValueError, "Wrong number of variables in RAMSES dump"
+        raise ValueError("Wrong number of variables in RAMSES dump")
     elif nvar_file < nvar:
         warnings.warn("Fewer hydro variables are in this RAMSES dump than are defined in config.ini (expected %d, got %d in file)" % (
             nvar, nvar_file), RuntimeWarning)
@@ -872,7 +869,7 @@ class RamsesSnap(SimSnap):
                 self[f]['phi'] *= self._info['boxlen']
 
     def _load_particle_cpuid(self):
-        raise NotImplementedError, "The particle CPU data cannot currently be loaded" # TODO: re-implement
+        raise NotImplementedError("The particle CPU data cannot currently be loaded") # TODO: re-implement
         ind0_dm = 0
         ind0_star = 0
         for i, star_mask, nstar in zip(self._cpus, self._particle_family_ids_on_disk, self._nstar):
@@ -940,7 +937,7 @@ class RamsesSnap(SimSnap):
             elif array_name in self._particle_blocks:
                 self._load_particle_block(array_name)
             else:
-                raise IOError, "No such array on disk"
+                raise IOError("No such array on disk")
         elif fam is family.gas:
 
             if array_name == 'pos' or array_name == 'smooth':
@@ -958,7 +955,7 @@ class RamsesSnap(SimSnap):
                 for u_block in self._rt_blocks_3d:
                     self[fam][u_block].units = self._rt_unit
             else:
-                raise IOError, "No such array on disk"
+                raise IOError("No such array on disk")
         elif fam is None and array_name in ['pos', 'vel']:
             # synchronized loading of pos/vel information
             if 'pos' not in self:
@@ -985,7 +982,7 @@ class RamsesSnap(SimSnap):
                 gasmass.convert_units(self['mass'].units)
                 self.gas['mass'] = gasmass
         else:
-            raise IOError, "No such array on disk"
+            raise IOError("No such array on disk")
 
 
 

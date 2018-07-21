@@ -110,7 +110,7 @@ class NchiladaSnap(SimSnap):
     def _open_file_for_array(self, fam, array_name):
         fname = self._loadable_keys_registry[fam].get(array_name, None)
         if not fname:
-            raise IOError, "No such array on disk"
+            raise IOError("No such array on disk")
         f = open(fname, 'rb')
         return f
 
@@ -125,9 +125,9 @@ class NchiladaSnap(SimSnap):
             _, nbod, ndim, dtype = self._load_header(self._open_file_for_array(fam, array_name))
             if universal_dtype is not None:
                 if ndim!=universal_ndim:
-                    raise IOError, "Mismatching dimensions for array"
+                    raise IOError("Mismatching dimensions for array")
                 if dtype!=universal_dtype:
-                    raise IOError, "Mismatching data type for array"
+                    raise IOError("Mismatching data type for array")
             universal_ndim, universal_dtype = ndim, dtype
 
         self._create_array(array_name,universal_ndim,universal_dtype,False)
@@ -175,12 +175,12 @@ class NchiladaSnap(SimSnap):
     def _write_array(self, array_name, fam=None) :
         if fam is None :
             fam = self.families()
-        
+
         for f in fam :
             fname = self._loadable_keys_registry[fam][array_name]
             # to do: sort out what happens when this doesn't exist
             ar = self[fam][array_name]
-            
+
             _, nbod, ndim, dtype = self._load_header(f)
             for readlen, buf_index, mem_index in self._load_control.iterate(fam, fam) :
                 b = np.fromfile(f, dtype=disk_dtype, count=readlen*ndim)

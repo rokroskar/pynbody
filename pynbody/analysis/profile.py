@@ -72,7 +72,7 @@ class Profile:
 
     *mass*       : mass in each bin
 
-    *mass_enc*   : enclosed mass 
+    *mass_enc*   : enclosed mass
 
     *fourier* : provides fourier coefficients, amplitude and phase for
      m=0 to m=6.  To access the amplitude profile of m=2 mode, do
@@ -98,7 +98,7 @@ class Profile:
 
     *beta*       : 3-D velocity anisotropy parameter
 
-    *magnitudes* : magnitudes in each bin - default band = 'v' 
+    *magnitudes* : magnitudes in each bin - default band = 'v'
 
     *sb*         : surface brightness - default band = 'v'
 
@@ -106,7 +106,7 @@ class Profile:
     Additional functions should use the profile_property to yield the
     desired profile.
 
-    **Lazy-loading arrays:** 
+    **Lazy-loading arrays:**
 
     The Profile class will automatically compute a mass-weighted
     profile for any lazy-loadable array of its parent SimSnap object.
@@ -141,7 +141,7 @@ class Profile:
 
     **Examples:**
 
-    Density profile of the entire simulation: 
+    Density profile of the entire simulation:
 
     >>> s = pynbody.load('mysim')
     >>> import pynbody.profile as profile
@@ -278,7 +278,7 @@ class Profile:
                 self._properties['bin_edges'] = util.equipartition(
                     x, self.nbins, self.min, self.max)
             else:
-                raise RuntimeError, "Bin type must be one of: lin, log, equaln"
+                raise RuntimeError("Bin type must be one of: lin, log, equaln")
 
             self['bin_edges'] = array.SimArray(self['bin_edges'], x.units)
             self['bin_edges'].sim = self.sim
@@ -385,7 +385,7 @@ class Profile:
             #    raise RuntimeError, "Derivatives only possible for profiles of fixed bin width."
 
         else:
-            raise KeyError, name + " is not a valid profile"
+            raise KeyError("%s is not a valid profile"%name)
 
     def _auto_profile(self, name, dispersion=False, rms=False, median=False):
         result = np.zeros(self.nbins)
@@ -440,7 +440,7 @@ class Profile:
         elif name in self._profiles:
             self._profiles[name] = item
         else:
-            raise KeyError, name + " is not a valid profile or property"
+            raise KeyError("%s is not a valid profile or property"%name)
 
     def __delitem__(self, name):
         del self._profiles[name]
@@ -699,7 +699,7 @@ def j_circ(p):
 
 @Profile.profile_property
 def v_circ(p, grav_sim=None):
-    """Circular velocity, i.e. rotation curve. Calculated by computing the gravity 
+    """Circular velocity, i.e. rotation curve. Calculated by computing the gravity
     in the midplane - can be expensive"""
 
     import pynbody.gravity.calc as gravity
@@ -817,7 +817,7 @@ def Q(self):
 
 @Profile.profile_property
 def X(self):
-    """X parameter defined as kappa^2*R/(2*pi*G*sigma*m) 
+    """X parameter defined as kappa^2*R/(2*pi*G*sigma*m)
     See Binney & Tremaine 2008, eq. 6.77"""
 
     lambda_crit = 4. * np.pi ** 2 * units.G * \
@@ -829,7 +829,7 @@ def X(self):
 @Profile.profile_property
 def jtot(self):
     """
-    Magnitude of the total angular momentum 
+    Magnitude of the total angular momentum
     """
     jtot = np.zeros(self.nbins)
 
@@ -907,9 +907,9 @@ class VerticalProfile(Profile):
 
     """
 
-    Creates a profile object that uses the absolute value of the z-coordinate for binning. 
+    Creates a profile object that uses the absolute value of the z-coordinate for binning.
 
-    **Input**: 
+    **Input**:
 
     *sim*: snapshot to make a profile from
 
@@ -919,7 +919,7 @@ class VerticalProfile(Profile):
 
     *zmax*: maximum height to consider in kpc
 
-    **Optional Keywords**: 
+    **Optional Keywords**:
 
     *ndim*: if ndim=2, an edge-on projected profile is produced,
      i.e. density is in units of mass/pc^2. If ndim=3 a volume
@@ -978,22 +978,22 @@ class QuantileProfile(Profile):
     Creates a profile object that returns the requested quantiles
     for a given array in a given bin.  The quantiles may be mass weighted.
 
-    **Input**: 
+    **Input**:
 
     *sim*: snapshot to make a profile from
 
-    *q (default: (0.16,0.5,0.84))*: 
+    *q (default: (0.16,0.5,0.84))*:
              The quantiles that will be returned.
              Default is median with 1-sigma on either side.
              q can be of arbitrary length allowing the user to select
              any quantiles they desire.
 
-    *weights (default:None)*:  
+    *weights (default:None)*:
              What should be used to weight the quantile.  You will usually
-             want to use particle mass: sim['mass'].  
+             want to use particle mass: sim['mass'].
              The default is to not weight by anything, weights=None.
 
-    **Optional Keywords**: 
+    **Optional Keywords**:
 
     *ndim*: if ndim=2, an edge-on projected profile is produced,
      i.e. density is in units of mass/pc^2. If ndim=3 a volume
@@ -1023,7 +1023,7 @@ class QuantileProfile(Profile):
             return self._profiles[name]
 
         else:
-            raise KeyError, name + " is not a valid QuantileProfile"
+            raise KeyError("%s is not a valid QuantileProfile"%name)
 
     def _auto_profile(self, name, dispersion=False, rms=False, median=False):
         result = np.zeros((self.nbins, len(self.quantiles)))

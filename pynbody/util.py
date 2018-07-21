@@ -60,7 +60,7 @@ def open_with_size(filename, *args):
 
 
 def eps_as_simarray(f, eps):
-    """Convert th given eps to a SimArray with units of f['pos'] and dtype of f['mass']""" 
+    """Convert th given eps to a SimArray with units of f['pos'] and dtype of f['mass']"""
     if isinstance(eps, str):
         eps = units.Unit(eps)
     if not isinstance(eps, units.UnitBase):
@@ -199,9 +199,9 @@ def relative_slice(s_relative_to, s):
     s_step = s.step if s.step is not None else 1
 
     if (s.start - s_relative_to.start) % s_relative_to_step != 0:
-        raise ValueError, "Incompatible slices"
+        raise ValueError("Incompatible slices")
     if s_step % s_relative_to_step != 0:
-        raise ValueError, "Incompatible slices"
+        raise ValueError("Incompatible slices")
 
     start = (s.start - s_relative_to.start) // s_relative_to_step
     step = s_step // s_relative_to_step
@@ -280,7 +280,7 @@ def concatenate_indexing(i1, i2):
     elif isinstance(i1, (np.ndarray, list)) and isinstance(i2, (slice, np.ndarray, slice)):
         return np.asarray(i1)[i2]
     else:
-        raise TypeError, "Don't know how to chain these index types"
+        raise TypeError("Don't know how to chain these index types")
 
 
 def indexing_length(sl_or_ar):
@@ -396,7 +396,7 @@ def bisect(left, right, f, epsilon=None, eta=0, verbose=False, niter_max=200):
         else:
             right = mid
 
-    raise ValueError, "Bisection algorithm did not converge"
+    raise ValueError("Bisection algorithm did not converge")
 
 
 def gauss_jordan(out):
@@ -428,7 +428,7 @@ def gauss_jordan(out):
 
             # no, out of options, must be a singular matrix
             if out[y][y]==0:
-                raise np.linalg.linalg.LinAlgError, "Singular matrix"
+                raise np.linalg.linalg.LinAlgError("Singular matrix")
 
         for y2 in range(y + 1, h):    # Eliminate column y
             c = out[y2][y] / out[y][y]
@@ -641,15 +641,15 @@ def read_fortran(f, dtype, n=1):
     length = n * dtype.itemsize
     alen = np.fromfile(f, _head_type, 1)
     if alen != length:
-        raise IOError, "Unexpected FORTRAN block length %d!=%d" % (
-            alen, length)
+        raise IOError("Unexpected FORTRAN block length %d!=%d" % (
+            alen, length))
 
     data = np.fromfile(f, dtype, n)
 
     alen = np.fromfile(f, _head_type, 1)
     if alen != length:
-        raise IOError, "Unexpected FORTRAN block length (tail) %d!=%d" % (
-            alen, length)
+        raise IOError("Unexpected FORTRAN block length (tail) %d!=%d" % (
+            alen, length))
 
     return data
 
@@ -683,7 +683,7 @@ def _thread_map(func, *args):
         try:
             this_t = threading.current_thread()
             this_t.ret_value = func(*afunc)
-        except Exception, e:
+        except Exception as e:
             this_t.ret_excp = e
 
     threads = []

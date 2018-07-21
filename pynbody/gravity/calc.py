@@ -1,15 +1,14 @@
-from .. import units
-from .. import array
-from .. import config
-from ..util import get_eps, eps_as_simarray
-
 import math
-import tree
-import numpy as np
-
 import warnings
 
-from ._gravity import direct
+import numpy as np
+
+from . import tree
+from .. import array, config, units
+from ..util import eps_as_simarray, get_eps
+from . import _gravity
+
+direct = _gravity.direct
 
 
 def all_direct(f, eps=None):

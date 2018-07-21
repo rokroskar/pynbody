@@ -3,7 +3,7 @@
 halo mass function (hmf)
 ========================
 
-Various halo mass function routines. 
+Various halo mass function routines.
 
 """
 
@@ -35,7 +35,7 @@ logger = logging.getLogger('pynbody.analysis.hmf')
 class FieldFilter(object):
 
     def __init__(self):
-        raise RuntimeError, "Cannot instantiate directly, use a subclass instead"
+        raise RuntimeError("Cannot instantiate directly, use a subclass instead")
 
     def M_to_R(self, M):
         """Return the mass scale (Msol h^-1) for a given length (Mpc h^-1 comoving)"""
@@ -47,7 +47,7 @@ class FieldFilter(object):
 
     @staticmethod
     def Wk(kR):
-        raise RuntimeError, "Not implemented"
+        raise RuntimeError("Not implemented")
 
 
 class TophatFilter(FieldFilter):
@@ -184,7 +184,7 @@ class PowerSpectrumCAMBLive(PowerSpectrumCAMB):
         from .. import config_parser
         path_to_camb = config_parser.get('camb', 'path')
         if path_to_camb == '/path/to/camb':
-            raise RuntimeError, "You need to compile CAMB and set up the executable path in your pynbody configuration file."
+            raise RuntimeError("You need to compile CAMB and set up the executable path in your pynbody configuration file.")
 
         file_in = open(
             os.path.join(os.path.dirname(__file__), "cambtemplate.ini"), "r")
@@ -375,7 +375,7 @@ def correlation(r, powspec=PowerSpectrumCAMB):
                 m += 2
 
             if m >= 50:
-                raise RuntimeError, "Convergence failure in sin y/y series integral"
+                raise RuntimeError("Convergence failure in sin y/y series integral")
 
             if m > 18:
                 gamma_method = True
@@ -470,7 +470,7 @@ def f_press_schechter(nu):
 
 
 def f_sheth_tormen(nu, Anorm=0.3222, a=0.707, p=0.3):
-    """   
+    """
     Sheth & Tormen (1999) fit (see also Sheth Mo & Tormen 2001)
     """
     #  Anorm: normalization, set so all mass is in halos (integral [f nu dn]=1)
@@ -528,9 +528,9 @@ def f_reed_no_z(nu, deltac=1.68647):  # universal form
 def f_reed_z_evo(nu, neff, deltac=1.68647):  # non-universal form
     # Reed et al. (2007) fit, eqn. 11 -- with redshift depedence for accuracy
     # at z >~ z_reion
-    """ modified S-T fit  by the n_eff dependence and the G1 and G2 gaussian terms and c 
-    where   P(k) proportional to k_halo**(n_eff)  and  
-    k_halo = Mhalo / r_halo_precollapse.  
+    """ modified S-T fit  by the n_eff dependence and the G1 and G2 gaussian terms and c
+    where   P(k) proportional to k_halo**(n_eff)  and
+    k_halo = Mhalo / r_halo_precollapse.
     eqn 13 of Reed et al 2007   estimtes neff = 6 d ln(1/sigma(M))/ d ln M  - 3 """
     sigma = deltac / nu
     # normalization that all mass is in halos not strictly conserved here
@@ -631,7 +631,7 @@ def halo_mass_function(context,
 
     *delta_crit:* The critical overdensity for collapse
 
-    **Returns:**       
+    **Returns:**
 
     *M:* The centre of the mass bins, in Msol h^-1
 
@@ -647,9 +647,9 @@ def halo_mass_function(context,
 
 
     Recommended m.f. for friends-of-friends linking length 0.2 particle sep.:
-    z <~ 2 : bhattacharya  
+    z <~ 2 : bhattacharya
     z >~ 5 : reed_universal (no redshift dependence)
-    : or reed_evolving (w/redshift dependence for additional accuracy) 
+    : or reed_evolving (w/redshift dependence for additional accuracy)
 
     """
 

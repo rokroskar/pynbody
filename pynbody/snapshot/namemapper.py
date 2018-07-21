@@ -1,5 +1,11 @@
-import ConfigParser
 import sys
+
+if sys.version_info[0] == 2:
+    import ConfigParser
+else:
+    import configparser as ConfigParser
+
+
 from .. import config_parser
 
 

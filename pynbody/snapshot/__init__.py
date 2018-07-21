@@ -135,7 +135,7 @@ class SimSnap(object):
         if array_name in self._split_arrays:
             array_name_1D = self._split_arrays[array_name]
         else:
-            array_name_1D = [array_name + "_" + i for i in 'x', 'y', 'z']
+            array_name_1D = [array_name + "_" + i for i in ['x', 'y', 'z']]
 
         return array_name_1D
 
@@ -345,7 +345,7 @@ class SimSnap(object):
         if name in self.keys():
             self._dependency_tracker.touching(name)
             return self._get_array(name)
-        
+
         with self._dependency_tracker.calculating(name):
             self.__resolve_obscuring_family_array(name)
 
@@ -661,7 +661,7 @@ class SimSnap(object):
         for line in f:
             if (not line.startswith("#")):
                 if ":" not in line:
-                    raise IOError, "Unknown format for units file %r"%(self.filename+".units")
+                    raise IOError("Unknown format for units file %r"%(self.filename+".units"))
                 else:
                     t, u = map(str.strip,line.split(":"))
                     t = name_mapping.get(t,t)
@@ -786,7 +786,7 @@ class SimSnap(object):
 
         global config
 
-        dims = [units.Unit(x) for x in distance, velocity, mass, 'a', 'h']
+        dims = [units.Unit(x) for x in [distance, velocity, mass, 'a', 'h']]
 
         all = self._arrays.values()
         for x in self._family_arrays:
@@ -871,7 +871,7 @@ class SimSnap(object):
         """Tries to load a copy of this snapshot, using partial loading to select
         only a subset of particles corresponding to a given SubSnap"""
         if getattr(self.ancestor,'partial_load',False):
-            raise NotImplementedError, "Cannot load a copy of data that was itself partial-loaded"
+            raise NotImplementedError("Cannot load a copy of data that was itself partial-loaded")
         return load(self.ancestor.filename, take=self.get_index_list(self.ancestor))
 
     ############################################
@@ -997,7 +997,7 @@ class SimSnap(object):
                 self[coord][np.where(self[coord] < 0)] += boxsize
                 self[coord][np.where(self[coord] > boxsize)] -= boxsize
         else:
-            raise ValueError, "Unknown wrapping convention"
+            raise ValueError("Unknown wrapping convention")
 
     ############################################
     # WRITING FUNCTIONS
